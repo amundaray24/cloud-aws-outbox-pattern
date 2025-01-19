@@ -11,8 +11,6 @@ Thumbs.db
 .settings
 *.iml
 *.ipr
-iac/binaries/lambdas/*
-iac/binaries/layers/*
 
 
 # User-specific stuff

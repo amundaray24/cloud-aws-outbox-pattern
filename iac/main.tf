@@ -124,6 +124,6 @@ module "lambdas" {
   source      = "./controllers/lambdas"
   resources   = var.lambdas
   role-arn    = module.lambda-role.arn
-  filename    = "./binaries/function.zip"
+  filename    = "./bin/default-function.zip"
   tags        = var.tags
 }
