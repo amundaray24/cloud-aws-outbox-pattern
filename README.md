@@ -22,6 +22,14 @@ The `/iac` directory contains the Terraform configuration for the project's infr
 - `modules/event-mapping`: Event mapping module configuration.
 - `modules/secrets-manager`: Secrets Manager module configuration.
 
+### 🛂 Controllers
+
+- `controllers/buckets`: Controller to iterate over the buckets and deploy them.
+- `controllers/dynamo`: Controller to iterate over the dynamo tables and deploy them.
+- `controllers/lambdas`: Controller to iterate over the lambdas and deploy them.
+- `controllers/subscriptions`: Controller to iterate over the subscriptions and deploy them.
+- `controllers/topics`: Controller to iterate over the topics and deploy them.
+
 ## 💻 Code (`/src`)
 
 The `/src` directory contains the project's source code, including Lambda functions and utilities.
@@ -55,9 +63,18 @@ The `/src` directory contains the project's source code, including Lambda functi
 .
 ├── iac
 │   ├── main.tf
-│   └── modules
-│       ├── s3
-│       ├── sns
+│   ├── controllers
+│   │   ├── buckets
+│   │   ├── dynamo
+│   │   └── ...
+│   ├── data
+│   ├── modules
+│   │   ├── s3
+│   │   ├── sns
+│   │   └── ...
+│   └── resources
+│       ├── lambdas.json
+│       ├── buckets.json
 │       └── ...
 └── src
     ├── lambdas
