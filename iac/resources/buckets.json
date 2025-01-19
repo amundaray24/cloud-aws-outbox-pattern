@@ -1,0 +1,12 @@
+{
+  "buckets": [
+    {
+      "name": "monkey-euc1-s3-outbox-pattern"
+    }
+  ],
+  "tags" : {
+    "owner": "amundaray24",
+    "project": "monkey-architecture",
+    "contact": "https://github.com/amundaray24"
+  }
+}

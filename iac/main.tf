@@ -5,6 +5,13 @@ terraform {
       version = "5.82.2"
     }
   }
+  backend "s3" {
+    bucket  = "monkey-euc1-s3-terraform-state"
+    key     = "outbox-pattern/terraform.tfstate"
+    region  = "eu-central-1"
+    profile = "personal"
+    encrypt = true
+  }
 }
 
 provider "aws" {
@@ -12,87 +19,7 @@ provider "aws" {
   profile = "personal"
 }
 
-# module "secret" {
-#   source                  = "./modules/secret-manager"
-#   name                    = "monkey-euc1-secret-outbox-pattern"
-#   description             = "Secret Manager for the outbox pattern"
-#   recovery-window-in-days = 0
-# }
-
-module "bucket" {
-  source  = "./modules/s3"
-  name    = "monkey-euc1-s3-outbox-pattern"
-}
-
-module "topic" {
-  source      = "./modules/sns"
-  name        = "monkey-euc1-sns-outbox-pattern.fifo"
-}
-
-module "insert-sub" {
-  source              = "./modules/sqs"
-  name                = "monkey-euc1-sqs-outbox-pattern-insert-sub"
-  topic-arn           = module.topic.arn
-  retention-time      = 604800
-  depends_on          = [module.topic]
-  visibility-timeout  = 30
-  filter-policy   = {
-    "operation": ["INSERT"]
-  }
-}
-
-module "modify-sub" {
-  source              = "./modules/sqs"
-  name                = "monkey-euc1-sqs-outbox-pattern-modify-sub"
-  topic-arn           = module.topic.arn
-  retention-time      = 604800
-  depends_on          = [module.topic]
-  visibility-timeout  = 30
-  filter-policy   = {
-    "operation": ["MODIFY"]
-  }
-}
-
-module "remove-sub" {
-  source              = "./modules/sqs"
-  name                = "monkey-euc1-sqs-outbox-pattern-remove-sub"
-  topic-arn           = module.topic.arn
-  retention-time      = 604800
-  depends_on          = [module.topic]
-  visibility-timeout  = 30
-  filter-policy   = {
-    "operation": ["REMOVE"]
-  }
-}
-
-module "table" {
-  source          = "./modules/dynamo"
-  name            = "monkey-euc1-dynamo-outbox-pattern"
-  hash-key-name   = "id"
-  hash-key-type   = "S"
-  range-key-name  = "created_at"
-  range-key-type  = "S"
-  billing-mode    = "PAY_PER_REQUEST"
-}
-
-module "layer-code" {
-  source      = "./modules/s3-resource"
-  bucket-name = "monkey-euc1-s3-outbox-pattern"
-  key         = "layers/python3.13-layer.zip"
-  path        = "${path.module}/binaries/layers/python3.13-layer.zip"
-  depends_on  = [module.bucket]
-}
-
-module "layer" {
-  source              = "./modules/layer"
-  name                = "monkey-euc1-layer-outbox-pattern"
-  description         = "Lambda Layer for the outbox pattern"
-  s3-bucket           = "monkey-euc1-s3-outbox-pattern"
-  s3-key              = "layers/python3.13-layer.zip"
-  compatible-runtimes = ["python3.13"]
-  depends_on          = [module.layer-code]
-}
-
+#FIXED MODULES
 module "lambda-policy" {
   source        = "./modules/iam-policy"
   name          = "monkey-euc1-policy-outbox-pattern-lambda-policy"
@@ -100,28 +27,6 @@ module "lambda-policy" {
   policy        = {
     Version = "2012-10-17"
     Statement = [
-      # {
-      #   Effect   = "Allow",
-      #   Action   = ["secretsmanager:GetSecretValue"],
-      #   Resource = module.secret.arn
-      # },
-      {
-        Effect   = "Allow",
-        Action   = [
-          "dynamodb:DescribeStream",
-          "dynamodb:GetRecords",
-          "dynamodb:GetShardIterator",
-          "dynamodb:ListStreams"
-        ],
-        Resource = module.table.stream-arn
-      },
-      {
-        Effect   = "Allow",
-        Action   = [
-          "sns:Publish"
-        ],
-        Resource =module.topic.arn
-      },
       {
         Effect   = "Allow"
         Action   = [
@@ -129,7 +34,7 @@ module "lambda-policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "arn:aws:logs:*:*:*"
+        Resource = "*"
       },
       {
         Action = [
@@ -138,11 +43,31 @@ module "lambda-policy" {
         ],
         Effect = "Allow",
         Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "sns:Publish"
+        ],
+        Resource = "*"
       }
     ]
   }
-  # depends_on    = [module.secret, module.table, module.topic]
-  depends_on    = [module.table, module.topic]
+  tags          = {
+    owner   = "amundaray24"
+    project = "monkey-architecture"
+    contact = "https://github.com/amundaray24"
+  }
 }
 
 module "lambda-role" {
@@ -151,42 +76,54 @@ module "lambda-role" {
   service     = "lambda.amazonaws.com"
   policy-arn  = module.lambda-policy.arn
   depends_on  = [module.lambda-policy]
-}
-
-module "action-splitter-code" {
-  source      = "./modules/s3-resource"
-  bucket-name = "monkey-euc1-s3-outbox-pattern"
-  key         = "lambdas/action-splitter.zip"
-  path        = "${path.module}/binaries/lambdas/action-splitter.zip"
-  depends_on  = [module.bucket]
-}
-
-module "action-splitter-function" {
-  source                = "./modules/lambda"
-  name                  = "monkey-euc1-lambda-outbox-pattern-action-splitter"
-  runtime               = "python3.13"
-  handler               = "function.handler"
-  role-arn              = module.lambda-role.arn
-  s3-bucket             = "monkey-euc1-s3-outbox-pattern"
-  s3-key                = "lambdas/action-splitter.zip"
-  time-out              = 30
-  layers-arn            = [module.layer.arn]
-  alias-name            = "active"
-  environment-variables = {
-    AWS_ACCOUNT_ID                     = "123456789012"
-    LOG_LEVEL                          = "INFO"
-    APP_ACTION_SPLITTER_SNS_TOPIC_NAME = "monkey-euc1-sns-outbox-pattern.fifo"
-
+  tags        = {
+    owner   = "amundaray24"
+    project = "monkey-architecture"
+    contact = "https://github.com/amundaray24"
   }
-  depends_on = [module.action-splitter-code, module.lambda-role, module.layer]
 }
 
-module "action-splitter-event-mapping" {
-  source              = "./modules/event-mapping"
-  source-arn          = module.table.stream-arn
-  lambda-arn          = module.action-splitter-function.arn
-  starting-position   = "LATEST"
-  batch-size          = 5
-  depends_on          = [module.table, module.action-splitter-function]
-  lambda-alias-name   = "active"
+module "bucket-code" {
+  source      = "./modules/s3"
+  name        = "monkey-euc1-s3-outbox-pattern-code"
+  tags          = {
+    owner   = "amundaray24"
+    project = "monkey-architecture"
+    contact = "https://github.com/amundaray24"
+  }
+}
+
+#DYNAMICS MODULES
+module "buckets" {
+  source    = "./controllers/buckets"
+  resources = var.buckets
+  tags      = var.tags
+}
+
+module "topics" {
+  source    = "./controllers/topics"
+  resources = var.topics
+  tags      = var.tags
+}
+
+module "subscriptions" {
+  source      = "./controllers/subscriptions"
+  resources   = var.subscriptions
+  topics-arn  = module.topics.arn-list
+  tags        = var.tags
+  depends_on = [module.topics]
+}
+
+module "dynamo" {
+  source          = "./controllers/dynamo"
+  resources       = var.dynamo
+  tags            = var.tags
+}
+
+module "lambdas" {
+  source      = "./controllers/lambdas"
+  resources   = var.lambdas
+  role-arn    = module.lambda-role.arn
+  filename    = "./binaries/function.zip"
+  tags        = var.tags
 }

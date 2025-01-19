@@ -1,36 +1,26 @@
 resource "aws_dynamodb_table" "this" {
-  name         = var.name
-  billing_mode = var.billing-mode
-  hash_key     = var.hash-key-name
-  range_key    = var.range-key-name
+  name              = var.name
+  billing_mode      = var.billing-mode
+  hash_key          = var.hash-key-name
+  range_key         = var.range-key-name
+  stream_enabled    = var.stream-enabled
+  stream_view_type  = var.stream-view-type
+  tags              = var.tags
 
-  attribute {
-    name = var.hash-key-name
-    type = var.hash-key-type
+  dynamic "attribute" {
+    for_each = var.attributes
+    content {
+      name = attribute.value.name
+      type = attribute.value.type
+    }
   }
 
-  attribute {
-    name = var.range-key-name
-    type = var.range-key-type
-  }
-
-  attribute {
-    name = "subject"
-    type = "S"
-  }
-
-  global_secondary_index {
-    hash_key        = "subject"
-    name            = "${var.name}-subject-index"
-    projection_type = "ALL"
-  }
-
-  stream_enabled   = true
-  stream_view_type = "NEW_AND_OLD_IMAGES"
-  tags = {
-    owner       = "amundaray24"
-    project     = "monkey-architecture"
-    environment = "dev"
-    contact     = "https://github.com/amundaray24"
+  dynamic "global_secondary_index" {
+    for_each = var.global-secondary-indexes
+    content {
+      name            = global_secondary_index.value.name
+      hash_key        = global_secondary_index.value.hash-key
+      projection_type = global_secondary_index.value.projection-type
+    }
   }
 }

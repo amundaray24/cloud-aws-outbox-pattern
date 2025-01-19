@@ -1,3 +1,8 @@
+variable "tags" {
+  description = "Tags to be applied to the resources"
+  type        = map(string)
+}
+
 variable "topic-arn" {
   description = "SNS Outbox pattern topic ARN"
   type        = string

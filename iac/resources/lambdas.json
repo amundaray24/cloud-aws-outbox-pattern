@@ -1,0 +1,25 @@
+{
+  "lambdas": [
+    {
+      "name": "monkey-euc1-lambda-outbox-pattern-action-splitter",
+      "runtime": "python3.13",
+      "handler": "function.handler",
+      "timeout": 30,
+      "dynamo-trigger": {
+        "table": "monkey-euc1-dynamo-outbox-pattern",
+        "batch-size": 5,
+        "starting-position": "LATEST"
+      },
+      "environment-variables": {
+        "AWS_ACCOUNT_ID": "123456789012",
+        "LOG_LEVEL": "INFO",
+        "APP_ACTION_SPLITTER_SNS_TOPIC_NAME": "monkey-euc1-sns-outbox-pattern.fifo"
+      }
+    }
+  ],
+  "tags" : {
+    "owner": "amundaray24",
+    "project": "monkey-architecture",
+    "contact": "https://github.com/amundaray24"
+  }
+}
