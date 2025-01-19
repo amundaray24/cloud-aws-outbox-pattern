@@ -1,0 +1,12 @@
+{
+  "topics": [
+    {
+      "name": "monkey-euc1-sns-outbox-pattern.fifo"
+    }
+  ],
+  "tags" : {
+    "owner": "amundaray24",
+    "project": "monkey-architecture",
+    "contact": "https://github.com/amundaray24"
+  }
+}

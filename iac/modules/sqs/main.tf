@@ -3,17 +3,12 @@ resource "aws_sqs_queue" "this" {
   message_retention_seconds   = var.retention-time
   fifo_queue                  = true
   visibility_timeout_seconds  = var.visibility-timeout
+  tags                        = var.tags
+  depends_on                  = [aws_sqs_queue.dlq]
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dlq.arn
     maxReceiveCount     = 5
   })
-  tags = {
-    owner       = "amundaray24"
-    project     = "monkey-architecture"
-    environment = "dev"
-    contact     = "https://github.com/amundaray24"
-  }
-  depends_on = [aws_sqs_queue.dlq]
 }
 
 resource "aws_sqs_queue" "dlq" {
@@ -21,12 +16,7 @@ resource "aws_sqs_queue" "dlq" {
   message_retention_seconds   = var.retention-time
   fifo_queue                  = true
   visibility_timeout_seconds  = var.visibility-timeout-dlq
-  tags = {
-    owner       = "amundaray24"
-    project     = "monkey-architecture"
-    environment = "dev"
-    contact     = "https://github.com/amundaray24"
-  }
+  tags                        = var.tags
 }
 
 resource "aws_sns_topic_subscription" "subscription" {

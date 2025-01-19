@@ -1,3 +1,8 @@
+variable "tags" {
+  description = "Tags to be applied to the resources"
+  type        = map(string)
+}
+
 variable "name" {
   description = "Lambda function name"
   type        = string
@@ -18,15 +23,15 @@ variable "role-arn" {
   type        = string
 }
 
-variable "s3-bucket" {
-  description = "S3 bucket name"
-  type        = string
-}
-
-variable "s3-key" {
-  description = "S3 key"
-  type        = string
-}
+# variable "s3-bucket" {
+#   description = "S3 bucket name"
+#   type        = string
+# }
+#
+# variable "s3-key" {
+#   description = "S3 key"
+#   type        = string
+# }
 
 variable "time-out" {
   description = "Time out of the function in seconds"
@@ -45,5 +50,10 @@ variable "environment-variables" {
 
 variable "alias-name" {
   description = "Name of the lambda function alias"
+  type        = string
+}
+
+variable "filename" {
+  description = "Path to the function's deployment package"
   type        = string
 }

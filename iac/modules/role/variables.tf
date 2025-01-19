@@ -1,3 +1,8 @@
+variable "tags" {
+  description = "Tags to be applied to the resources"
+  type        = map(string)
+}
+
 variable "name" {
   description = "Role name"
   type        = string

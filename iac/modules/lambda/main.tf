@@ -3,21 +3,15 @@ resource "aws_lambda_function" "this" {
   runtime       = var.runtime
   handler       = var.handler
   role          = var.role-arn
-  s3_bucket     = var.s3-bucket
-  s3_key        = var.s3-key
+  filename      = var.filename
   timeout       = var.time-out
   layers        = var.layers-arn
+  tags          = var.tags
   environment {
     variables   = var.environment-variables
   }
   tracing_config {
     mode = "Active"
-  }
-  tags = {
-    owner       = "amundaray24"
-    project     = "monkey-architecture"
-    environment = "dev"
-    contact     = "https://github.com/amundaray24"
   }
 }
 

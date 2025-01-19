@@ -1,0 +1,36 @@
+{
+  "subscriptions": [
+    {
+      "name": "monkey-euc1-sqs-outbox-pattern-insert-sub",
+      "topic": "monkey-euc1-sns-outbox-pattern.fifo",
+      "retention-time" : 604800,
+      "visibility-timeout" : 30,
+      "filter-policy": {
+        "operation": ["INSERT"]
+      }
+    },
+    {
+      "name": "monkey-euc1-sqs-outbox-pattern-modify-sub",
+      "topic": "monkey-euc1-sns-outbox-pattern.fifo",
+      "retention-time" : 604800,
+      "visibility-timeout" : 30,
+      "filter-policy": {
+        "operation": ["MODIFY"]
+      }
+    },
+    {
+      "name": "monkey-euc1-sqs-outbox-pattern-remove-sub",
+      "topic": "monkey-euc1-sns-outbox-pattern.fifo",
+      "retention-time" : 604800,
+      "visibility-timeout" : 30,
+      "filter-policy": {
+        "operation": ["REMOVE"]
+      }
+    }
+  ],
+  "tags" : {
+    "owner": "amundaray24",
+    "project": "monkey-architecture",
+    "contact": "https://github.com/amundaray24"
+  }
+}

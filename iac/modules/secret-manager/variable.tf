@@ -1,3 +1,8 @@
+variable "tags" {
+  description = "Tags to be applied to the resources"
+  type        = map(string)
+}
+
 variable "name" {
   description = "Secret manager name of the secret"
   type        = string

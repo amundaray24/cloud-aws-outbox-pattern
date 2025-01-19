@@ -1,5 +1,6 @@
 resource "aws_iam_role" "this" {
   name                = var.name
+  tags                = var.tags
   assume_role_policy  = jsonencode({
    Version =  "2012-10-17"
     Statement = [
@@ -12,12 +13,6 @@ resource "aws_iam_role" "this" {
       }
     ]
   })
-  tags = {
-    owner       = "amundaray24"
-    project     = "monkey-architecture"
-    environment = "dev"
-    contact     = "https://github.com/amundaray24"
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "policy-attachment" {
