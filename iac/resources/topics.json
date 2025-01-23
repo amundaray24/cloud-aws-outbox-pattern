@@ -2,6 +2,12 @@
   "topics": [
     {
       "name": "monkey-euc1-sns-outbox-pattern.fifo"
+    },
+    {
+      "name": "monkey-euc1-sns-target-1.fifo"
+    },
+    {
+      "name": "monkey-euc1-sns-target-2.fifo"
     }
   ],
   "tags" : {

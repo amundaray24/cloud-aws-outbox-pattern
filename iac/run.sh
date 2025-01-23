@@ -28,7 +28,7 @@ if [ "$command" == "init" ]; then
 elif [ "$command" == "plan" ]; then
   terraform plan $resources_params
 elif [ "$command" == "apply" ]; then
-  terraform apply $resources_params
+  terraform apply --auto-approve $resources_params
 elif [ "$command" == "destroy" ]; then
   terraform destroy $resources_params
 else

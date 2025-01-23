@@ -5,13 +5,19 @@
       "runtime": "python3.13",
       "handler": "function.handler",
       "timeout": 30,
+      "layers": [
+        {
+          "name": "monkey-euc1-layer-outbox-pattern-py",
+          "version": "1"
+        }
+      ],
       "dynamo-trigger": {
         "table": "monkey-euc1-dynamo-outbox-pattern",
         "batch-size": 5,
         "starting-position": "LATEST"
       },
       "environment-variables": {
-        "AWS_ACCOUNT_ID": "123456789012",
+        "AWS_ACCOUNT_ID": "000000000000",
         "LOG_LEVEL": "INFO",
         "APP_ACTION_SPLITTER_SNS_TOPIC_NAME": "monkey-euc1-sns-outbox-pattern.fifo"
       }
