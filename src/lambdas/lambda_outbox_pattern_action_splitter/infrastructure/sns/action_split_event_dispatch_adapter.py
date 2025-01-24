@@ -1,8 +1,5 @@
 import os
 import uuid
-import json
-
-from datetime import datetime
 
 from domain.event_action import EventAction
 
@@ -25,16 +22,12 @@ class ActionSplitEventDispatchAdapter:
     self._dispatcher = SNSDispatcher()
     self._topic_name = os.environ.get('APP_ACTION_SPLITTER_SNS_TOPIC_NAME', 'app-action-splitter-sns-topic')
 
-  def dispatch(self, event_action: EventAction):
+  def dispatch(self, event_action: EventAction, headers: dict):
     logger.debug(f"ActionSplitEventDispatchAdapter: {event_action.operation}")
     logger.info(f'ActionSplitEventDispatchAdapter: dispatching event to SNS topic: {self._topic_name}')
-    headers = {
-      "eventDate": str(datetime.now().isoformat()),
-      "operation": event_action.operation
-    }
     self._dispatcher.publish_message(
       sns_topic_name=self._topic_name,
-      message=json.dumps(event_action.data),
+      message=event_action.model_dump_json(exclude_none=True),
       message_attributes=headers,
       message_group_id=event_action.operation,
       message_deduplication_id=str(uuid.uuid4())

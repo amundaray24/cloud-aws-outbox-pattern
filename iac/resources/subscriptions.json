@@ -6,7 +6,8 @@
       "retention-time" : 604800,
       "visibility-timeout" : 30,
       "filter-policy": {
-        "operation": ["INSERT"]
+        "operation": ["INSERT"],
+        "currentStatus": ["TO_DISPATCH"]
       }
     },
     {
@@ -15,7 +16,9 @@
       "retention-time" : 604800,
       "visibility-timeout" : 30,
       "filter-policy": {
-        "operation": ["MODIFY"]
+        "operation": ["MODIFY"],
+        "currentStatus": ["TO_DISPATCH"],
+        "previousStatus": ["DISPATCHED"]
       }
     },
     {

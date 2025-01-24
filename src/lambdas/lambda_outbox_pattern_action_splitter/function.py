@@ -2,6 +2,7 @@ import json
 
 from lambda_utils_logger.logger_util import Logger
 from lambda_utils_xray.xray_util import XRayUtil
+from lambda_utils_dynamo_serializer.dynamo_deserializer import DynamoDeserializer
 
 from configurator import Configurator
 from domain.event_action import EventAction
@@ -27,11 +28,7 @@ def _process_record(record):
     logger.info(f"Processing record")
     logger.debug(f"Processing record: {json.dumps(record, indent=2)}")
     xray_util.create_new_subsegment("process_record")
-    record = {
-      "operation": record['eventName'],
-      "data": record['dynamodb']
-    }
-    event_action = EventAction(**record)
+    event_action = _map_record(record)
     logger.debug(f"Event action: {event_action}")
     ActionSplitUseCase.execute(event_action)
     logger.info(f"Record processed successfully")
@@ -40,3 +37,15 @@ def _process_record(record):
     raise e
   finally:
     xray_util.end_subsegment()
+
+def _map_record(record):
+  event = DynamoDeserializer().deserialize(record['dynamodb'])
+  record = {
+    "id": event.get('Keys', {}).get('id'),
+    "operation": record.get('eventName')
+  }
+  if 'NewImage' in event:
+    record['current'] = event['NewImage']
+  if 'OldImage' in event:
+    record['previous'] = event['OldImage']
+  return EventAction(**record)

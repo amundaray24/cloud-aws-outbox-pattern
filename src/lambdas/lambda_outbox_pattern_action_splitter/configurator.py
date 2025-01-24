@@ -2,6 +2,7 @@ from lambda_utils_logger.logger_util import Logger
 from lambda_utils_xray.xray_util import XRayUtil
 from lambda_utils_secret_manager.secret_manager_util import SecretManagerUtil
 from lambda_utils_sns_dispatcher.sns_dispatcher import SNSDispatcher
+from lambda_utils_dynamo_serializer.dynamo_deserializer import DynamoDeserializer
 
 class Configurator:
 
@@ -18,5 +19,6 @@ class Configurator:
     XRayUtil()
     SecretManagerUtil()
     SNSDispatcher()
+    DynamoDeserializer()
 
 

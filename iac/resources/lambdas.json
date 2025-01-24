@@ -8,7 +8,7 @@
       "layers": [
         {
           "name": "monkey-euc1-layer-outbox-pattern-py",
-          "version": "1"
+          "version": "2"
         }
       ],
       "dynamo-trigger": {
