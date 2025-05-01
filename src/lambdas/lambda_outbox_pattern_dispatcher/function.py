@@ -4,17 +4,17 @@ from lambda_utils_xray.xray_util import XRayUtil
 
 from configurator import Configurator
 from mapper import Mapper
-from application.action_split_use_case import ActionSplitUseCase
+from application.event_dispatcher_user_case import EventDispatcherUseCase
 
-logger = Logger().get_logger("lambda_outbox_pattern_action_splitter")
+logger = Logger().get_logger("lambda_outbox_pattern_dispatcher")
 xray_util = XRayUtil()
 Configurator()
 
-class LambdaOutboxPatternActionSplitter(EventsBaseHandler):
+class LambdaOutboxPatternDispatcher(EventsBaseHandler):
 
   def __init__(self):
-    super().__init__(ActionSplitUseCase, Mapper)
+    super().__init__(EventDispatcherUseCase,Mapper)
 
 def handler(event, context):
-  dispatcher = LambdaOutboxPatternActionSplitter()
+  dispatcher = LambdaOutboxPatternDispatcher()
   return dispatcher.handler(event, context)

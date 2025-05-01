@@ -8,18 +8,40 @@
       "layers": [
         {
           "name": "monkey-euc1-layer-outbox-pattern-py",
-          "version": "2"
+          "version": "13"
         }
       ],
       "dynamo-trigger": {
         "table": "monkey-euc1-dynamo-outbox-pattern",
-        "batch-size": 5,
-        "starting-position": "LATEST"
+        "batch-size": 1,
+        "starting-position": "LATEST",
+        "maximum-retry-attempts" : 5
       },
       "environment-variables": {
         "AWS_ACCOUNT_ID": "000000000000",
         "LOG_LEVEL": "INFO",
         "APP_ACTION_SPLITTER_SNS_TOPIC_NAME": "monkey-euc1-sns-outbox-pattern.fifo"
+      }
+    },
+    {
+      "name": "monkey-euc1-lambda-outbox-pattern-dispatcher",
+      "runtime": "python3.13",
+      "handler": "function.handler",
+      "timeout": 30,
+      "layers": [
+        {
+          "name": "monkey-euc1-layer-outbox-pattern-py",
+          "version": "13"
+        }
+      ],
+      "sqs-trigger": {
+        "queue": "monkey-euc1-sqs-outbox-pattern-insert-sub.fifo",
+        "batch-size": 1
+      },
+      "environment-variables": {
+        "AWS_ACCOUNT_ID": "000000000000",
+        "LOG_LEVEL": "INFO",
+        "OUTBOX_PATTERN_BUCKET_NAME": "monkey-euc1-s3-outbox-pattern"
       }
     }
   ],

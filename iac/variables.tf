@@ -76,6 +76,11 @@ variable "lambdas" {
       table = string
       batch-size = number
       starting-position = string
+      maximum-retry-attempts = number
+    }))
+    sqs-trigger = optional(object({
+      queue = string
+      batch-size = number
     }))
     environment-variables = map(string)
   }))

@@ -14,19 +14,44 @@ module "streams" {
   name   = each.value.dynamo-trigger.table
 }
 
+module "queues" {
+  for_each = {
+    for resource in var.resources :
+    resource.name => resource
+    if lookup(resource, "sqs-trigger", null) != null
+  }
+  source = "../../data/sqs"
+  name   = each.value.sqs-trigger.queue
+}
+
 module "dynamo-event-mapping" {
   for_each = {
     for resource in var.resources :
     resource.name => resource
     if lookup(resource, "dynamo-trigger", null) != null
   }
+  source                  = "../../modules/event-mapping"
+  source-arn              = module.streams[each.value.name].streams-arn
+  lambda-arn              = module.resources[each.value.name].arn
+  starting-position       = each.value.dynamo-trigger.starting-position
+  maximum-retry-attempts  = each.value.dynamo-trigger.maximum-retry-attempts
+  batch-size              = each.value.dynamo-trigger.batch-size
+  lambda-alias-name       = "active"
+  depends_on              = [module.resources, module.streams]
+}
+
+module "sqs-event-mapping" {
+  for_each = {
+    for resource in var.resources :
+    resource.name => resource
+    if lookup(resource, "sqs-trigger", null) != null
+  }
   source              = "../../modules/event-mapping"
-  source-arn          = module.streams[each.value.name].streams-arn
+  source-arn          = module.queues[each.value.name].queue-arn
   lambda-arn          = module.resources[each.value.name].arn
-  starting-position   = each.value.dynamo-trigger.starting-position
-  batch-size          = each.value.dynamo-trigger.batch-size
+  batch-size          = each.value.sqs-trigger.batch-size
   lambda-alias-name   = "active"
-  depends_on          = [module.resources, module.streams]
+  depends_on          = [module.resources, module.queues]
 }
 
 module "resources" {

@@ -29,6 +29,21 @@
       "filter-policy": {
         "operation": ["REMOVE"]
       }
+    },
+    {
+      "name": "monkey-euc1-sqs-target-1-test-sub",
+      "topic": "monkey-euc1-sns-target-1.fifo",
+      "retention-time" : 604800,
+      "visibility-timeout" : 30,
+      "filter-policy": {}
+    }
+    ,
+    {
+      "name": "monkey-euc1-sqs-target-2-test-sub",
+      "topic": "monkey-euc1-sns-target-2.fifo",
+      "retention-time" : 604800,
+      "visibility-timeout" : 30,
+      "filter-policy": {}
     }
   ],
   "tags" : {

@@ -50,7 +50,9 @@ module "lambda-policy" {
           "dynamodb:DescribeStream",
           "dynamodb:GetRecords",
           "dynamodb:GetShardIterator",
-          "dynamodb:ListStreams"
+          "dynamodb:ListStreams",
+          "dynamodb:DescribeTable",
+          "dynamodb:UpdateItem"
         ],
         Resource = "*"
       },
@@ -58,6 +60,25 @@ module "lambda-policy" {
         Effect   = "Allow",
         Action   = [
           "sns:Publish"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:ReceiveMessage"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject"
         ],
         Resource = "*"
       }

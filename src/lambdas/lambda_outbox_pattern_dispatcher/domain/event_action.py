@@ -1,7 +1,5 @@
 import uuid
 from enum import StrEnum
-from datetime import datetime
-from typing import Annotated, Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,15 +11,15 @@ class EventActionStatus(StrEnum):
 class EventActionDataImage(BaseModel):
     id: uuid.UUID
     subject: str
-    status: EventActionStatus = EventActionStatus.TO_DISPATCH
+    status: EventActionStatus = EventActionStatus.TO_DISPATCH,
     reason: str = None
-    s3Key: Annotated[str, Field(alias="s3_key")]
-    deduplicationId: Annotated[str, Field(alias="deduplication_id")]
-    messageGroupId: Annotated[str, Field(alias="message_group_id")]
+    s3Key: str
+    deduplicationId: str
+    messageGroupId: str
     headers: dict
     topic: str
-    createdAt: Annotated[datetime, Field(alias="created_at")]
-    lastUpdatedAt: Annotated[datetime, Field(alias="last_updated_at")]
+    createdAt: str
+    lastUpdatedAt: str
 
 class EventAction(BaseModel):
     id: str
